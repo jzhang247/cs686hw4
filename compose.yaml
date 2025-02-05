@@ -1,0 +1,34 @@
+version: "3.0"
+services:
+  frontend:
+    image: bookstore/frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    
+    
+  backend:
+    image: bookstore/backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8800:8800"
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: bookstore/mysql
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "3306:3306"
+
